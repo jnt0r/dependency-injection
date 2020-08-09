@@ -1,7 +1,7 @@
 package demo;
 
-import de.jnt0r.autowire.Initializer;
-import de.jnt0r.autowire.annotations.Autowire;
+import de.jnt0r.initializer.Initializer;
+import de.jnt0r.initializer.annotations.Autowire;
 
 public class DemoApplication {
 

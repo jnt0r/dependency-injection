@@ -1,6 +1,6 @@
 package demo;
 
-import de.jnt0r.autowire.annotations.Component;
+import de.jnt0r.initializer.annotations.Component;
 
 @Component("myDemoService")
 public class DemoService {
