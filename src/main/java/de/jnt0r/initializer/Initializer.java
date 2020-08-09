@@ -36,7 +36,6 @@ public class Initializer {
             System.exit(1);
         }
 
-
         try {
             T applicationInstance = clazz.newInstance();
             injectComponentsInto(clazz, applicationInstance);
@@ -80,11 +79,11 @@ public class Initializer {
         }
     }
 
-    private static Set<Class<?>> componentScan(Package basePackage) {
+    protected static Set<Class<?>> componentScan(Package basePackage) {
         logger.info("Scanning for components...");
 
         Set<Class<?>> componentClasses = new HashSet<>();
-        Reflections ref = new Reflections(basePackage);
+        Reflections ref = new Reflections(ClasspathHelper.forPackage(basePackage.getName()));
         for (Class<?> cl : ref.getTypesAnnotatedWith(Component.class)) {
             Component findable = cl.getAnnotation(Component.class);
             logger.info("Found component with name '{}' in class {}",
