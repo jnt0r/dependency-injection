@@ -3,5 +3,5 @@ package componentScanTestPackage;
 import de.jnt0r.initializer.annotations.Component;
 
 @Component
-public class SecondComponent {
+public class ThirdComponent {
 }

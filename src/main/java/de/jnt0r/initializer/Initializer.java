@@ -2,12 +2,17 @@ package de.jnt0r.initializer;
 
 import de.jnt0r.initializer.annotations.Autowire;
 import de.jnt0r.initializer.annotations.Component;
+import de.jnt0r.initializer.exceptions.InitializationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.ResourcesScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -65,7 +70,7 @@ public class Initializer {
                 field.setAccessible(true);
                 Object value = components.get(field.getType());
                 if (value == null) {
-                    throw new RuntimeException("Cannot Autowire field " + field.getName() + " of type " + field.getType().getCanonicalName() + " in class " + clazz.getCanonicalName() + " because required class has not been initialized.");
+                    throw new InitializationException("Cannot Autowire field " + field.getName() + " of type " + field.getType().getCanonicalName() + " in class " + clazz.getCanonicalName() + " because required class has not been initialized.");
                 }
                 logger.info(value);
                 field.set(component, value);
@@ -82,8 +87,12 @@ public class Initializer {
     protected static Set<Class<?>> componentScan(Package basePackage) {
         logger.info("Scanning for components...");
 
+        Reflections ref = new Reflections(new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forJavaClassPath())
+                .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(basePackage.getName())))
+                .setScanners(new ResourcesScanner(), new TypeAnnotationsScanner(), new SubTypesScanner()));
+
         Set<Class<?>> componentClasses = new HashSet<>();
-        Reflections ref = new Reflections(ClasspathHelper.forPackage(basePackage.getName()));
         for (Class<?> cl : ref.getTypesAnnotatedWith(Component.class)) {
             Component findable = cl.getAnnotation(Component.class);
             logger.info("Found component with name '{}' in class {}",
